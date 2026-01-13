@@ -13,7 +13,7 @@
     "type=bind,source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,readonly"
   ],
   "remoteEnv": {
-    "SSH_AUTH_SOCK": "/tmp/ssh-agent.sock"
+    "SSH_AUTH_SOCK": "${localEnv:SSH_AUTH_SOCK}"
   },
   "features": {
     "ghcr.io/devcontainers/features/git:1": {
