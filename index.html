@@ -1,375 +1,87 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TTS WebApp - Text to Speech</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
         }
-
-        .container {
-            background: white;
+        .card {
+            border: none;
             border-radius: 16px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 600px;
-            width: 100%;
-            padding: 40px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 28px;
-            color: #333;
-            margin-bottom: 8px;
-        }
-
-        .header p {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .form-group {
-            margin-bottom: 24px;
-        }
-
-        label {
-            display: block;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 14px;
-            resize: vertical;
-            min-height: 120px;
-            transition: border-color 0.3s;
-        }
-
-        textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        select {
-            padding: 10px 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .speed-control {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        input[type="range"] {
-            flex: 1;
-            height: 6px;
-            border-radius: 3px;
-            background: #e0e0e0;
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #667eea;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        input[type="range"]::-webkit-slider-thumb:hover {
-            background: #764ba2;
-        }
-
-        input[type="range"]::-moz-range-thumb {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #667eea;
-            cursor: pointer;
-            border: none;
-            transition: background 0.3s;
-        }
-
-        input[type="range"]::-moz-range-thumb:hover {
-            background: #764ba2;
-        }
-
-        .speed-value {
-            min-width: 35px;
-            text-align: right;
-            font-weight: 600;
-            color: #667eea;
-            font-size: 14px;
-        }
-
-        .button-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        button {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-generate {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            grid-column: 1 / -1;
-        }
-
-        .btn-generate:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-generate:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .btn-stop {
-            background: #f44336;
-            color: white;
-            display: none;
-        }
-
-        .btn-stop.show {
-            display: block;
-            grid-column: 1 / -1;
-        }
-
-        .btn-stop:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(244, 67, 54, 0.4);
-        }
-
-        .btn-copy {
-            background: #4caf50;
-            color: white;
-        }
-
-        .btn-copy:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.4);
-        }
-
-        .btn-download {
-            background: #2196f3;
-            color: white;
-        }
-
-        .btn-download:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(33, 150, 243, 0.4);
-        }
-
-        .btn-download:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .audio-player {
-            margin-bottom: 24px;
-            display: none;
-        }
-
-        .audio-player.show {
-            display: block;
-        }
-
-        audio {
-            width: 100%;
-            margin-bottom: 12px;
-        }
-
-        .status {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 24px;
-            display: none;
-            font-size: 14px;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .status.show {
-            display: block;
-        }
-
-        .status.loading {
-            background: #e3f2fd;
-            color: #1976d2;
-            border-left: 4px solid #1976d2;
-        }
-
-        .status.success {
-            background: #e8f5e9;
-            color: #388e3c;
-            border-left: 4px solid #388e3c;
-        }
-
-        .status.error {
-            background: #ffebee;
-            color: #c62828;
-            border-left: 4px solid #c62828;
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 14px;
-            height: 14px;
-            border: 2px solid rgba(0, 0, 0, 0.1);
-            border-top-color: currentColor;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-right: 8px;
-            vertical-align: middle;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .info {
-            font-size: 12px;
-            color: #999;
-            text-align: center;
-            margin-top: 16px;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🎙️ Text to Speech</h1>
-            <p>Convierte texto en audio con IA</p>
-        </div>
-
-        <div class="status" id="status"></div>
-
-        <form id="ttsForm">
-            <div class="form-group">
-                <label for="text">Texto a convertir</label>
-                <textarea id="text" placeholder="Escribe o pega tu texto aquí..." required></textarea>
+<body class="d-flex align-items-center justify-content-center p-3">
+    <div class="container" style="max-width: 600px;">
+        <div class="card p-4">
+            <div class="card-header text-center bg-white border-0">
+                <h1 class="h4 mb-2">🎙️ Text to Speech</h1>
+                <p class="text-muted small">Convert text to audio with AI</p>
             </div>
-
-            <div class="form-group">
-                <label>Configuración</label>
-                <div class="controls">
-                    <div>
-                        <label for="voice" style="margin-bottom: 4px; font-weight: 500; font-size: 12px;">Voz</label>
-                        <select id="voice">
-                            <option value="">Cargando voces...</option>
-                        </select>
+            <div class="card-body">
+                <div class="alert d-none" id="status"></div>
+                <form id="ttsForm">
+                    <div class="mb-3">
+                        <label for="text" class="form-label fw-bold">Text to convert</label>
+                        <textarea class="form-control" id="text" rows="5" placeholder="Write or paste your text here..." required></textarea>
                     </div>
-                    <div>
-                        <label for="format" style="margin-bottom: 4px; font-weight: 500; font-size: 12px;">Formato</label>
-                        <select id="format">
-                            <option value="mp3">MP3</option>
-                            <option value="wav">WAV</option>
-                            <option value="opus">Opus</option>
-                            <option value="flac">FLAC</option>
-                            <option value="m4a">M4A</option>
-                        </select>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Settings</label>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="voice" class="form-label small">Voice</label>
+                                <select class="form-select" id="voice">
+                                    <option value="">Loading voices...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="format" class="form-label small">Format</label>
+                                <select class="form-select" id="format">
+                                    <option value="mp3">MP3</option>
+                                    <option value="wav">WAV</option>
+                                    <option value="opus">Opus</option>
+                                    <option value="flac">FLAC</option>
+                                    <option value="m4a">M4A</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Speed</label>
+                        <div class="d-flex align-items-center">
+                            <input type="range" class="form-range flex-grow-1 me-3" id="speed" min="0.5" max="2" step="0.1" value="1.0">
+                            <span class="badge bg-primary" id="speedValue">1.0x</span>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 mb-3">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <button type="button" class="btn btn-success w-100" id="copyBtn">📋 Copy</button>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" class="btn btn-info w-100" id="downloadBtn" disabled>⬇️ Download</button>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="generateBtn">✨ Generate Audio</button>
+                        <button type="button" class="btn btn-danger d-none" id="stopBtn">⏹️ Stop</button>
+                    </div>
+                </form>
+                <div class="mt-3 d-none" id="audioPlayer">
+                    <audio class="w-100" id="audio" controls></audio>
                 </div>
             </div>
-
-            <div class="form-group">
-                <label>Velocidad</label>
-                <div class="speed-control">
-                    <input type="range" id="speed" min="0.5" max="2" step="0.1" value="1.0">
-                    <span class="speed-value" id="speedValue">1.0x</span>
-                </div>
+            <div class="card-footer text-center text-muted small border-0 bg-transparent">
+                Uses Kokoro FastAPI • Supports multiple languages
             </div>
-
-            <div class="button-group">
-                <button type="button" class="btn-copy" id="copyBtn">📋 Copiar</button>
-                <button type="button" class="btn-download" id="downloadBtn" disabled>⬇️ Descargar</button>
-                <button type="submit" class="btn-generate" id="generateBtn">✨ Generar Audio</button>
-                <button type="button" class="btn-stop" id="stopBtn">⏹️ Detener</button>
-            </form>
-        </form>
-
-        <div class="audio-player" id="audioPlayer">
-            <audio id="audio" controls></audio>
-        </div>
-
-        <div class="info">
-            Usa Kokoro FastAPI • Soporta múltiples idiomas
         </div>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script>
         const form = document.getElementById('ttsForm');
         const textInput = document.getElementById('text');
@@ -403,7 +115,7 @@
                     voiceSelect.value = voices.voices[0];
                 }
             } catch (error) {
-                showStatus('Error al cargar las voces', 'error');
+                showStatus('Error loading voices', 'error');
                 console.error(error);
             }
         }
@@ -411,27 +123,27 @@
         // Mostrar estado
         function showStatus(message, type = 'loading') {
             status.textContent = '';
-            status.className = `status show ${type}`;
+            status.className = `alert alert-${type === 'loading' ? 'primary' : type === 'success' ? 'success' : 'danger'} d-block`;
             if (type === 'loading') {
-                status.innerHTML = `<span class="spinner"></span>${message}`;
+                status.innerHTML = `<div class="spinner-border spinner-border-sm me-2" role="status"></div>${message}`;
             } else {
                 status.textContent = message;
             }
         }
 
         function hideStatus() {
-            status.classList.remove('show');
+            status.className = 'alert d-none';
         }
 
         // Actualizar velocidad
-        speedInput.addEventListener('change', () => {
+        speedInput.addEventListener('input', () => {
             speedValue.textContent = speedInput.value + 'x';
         });
 
         // Copiar texto
         copyBtn.addEventListener('click', () => {
             navigator.clipboard.writeText(textInput.value).then(() => {
-                showStatus('✓ Copiado al portapapeles', 'success');
+                showStatus('✓ Copied to clipboard', 'success');
                 setTimeout(hideStatus, 2000);
             });
         });
@@ -451,9 +163,9 @@
         stopBtn.addEventListener('click', () => {
             if (abortController) {
                 abortController.abort();
-                showStatus('Generación cancelada', 'error');
+                showStatus('Generation canceled', 'error');
                 setTimeout(hideStatus, 2000);
-                stopBtn.classList.remove('show');
+                stopBtn.classList.add('d-none');
                 generateBtn.disabled = false;
             }
         });
@@ -464,15 +176,15 @@
 
             const text = textInput.value.trim();
             if (!text) {
-                showStatus('Por favor escribe algo', 'error');
+                showStatus('Please write something', 'error');
                 return;
             }
 
             abortController = new AbortController();
             generateBtn.disabled = true;
-            stopBtn.classList.add('show');
-            showStatus('Generando audio...', 'loading');
-            audioPlayer.classList.remove('show');
+            stopBtn.classList.remove('d-none');
+            showStatus('Generating audio...', 'loading');
+            audioPlayer.classList.add('d-none');
 
             try {
                 const response = await fetch('/api/tts', {
@@ -496,9 +208,9 @@
                 const blob = await response.blob();
                 audioUrl = URL.createObjectURL(blob);
                 audio.src = audioUrl;
-                audioPlayer.classList.add('show');
+                audioPlayer.classList.remove('d-none');
                 downloadBtn.disabled = false;
-                showStatus('✓ Audio generado correctamente', 'success');
+                showStatus('✓ Audio generated successfully', 'success');
                 setTimeout(hideStatus, 2000);
             } catch (error) {
                 if (error.name !== 'AbortError') {
@@ -507,7 +219,7 @@
                 }
             } finally {
                 generateBtn.disabled = false;
-                stopBtn.classList.remove('show');
+                stopBtn.classList.add('d-none');
             }
         });
 

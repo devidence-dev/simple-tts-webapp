@@ -4,8 +4,9 @@ from fastapi.staticfiles import StaticFiles
 import httpx
 from pydantic import BaseModel
 from pathlib import Path
+import os
 
-KOKORO_BASE = "http://localhost:8880"
+KOKORO_BASE = os.getenv("KOKORO_BASE", "http://localhost:8880")
 
 app = FastAPI()
 
@@ -46,6 +47,6 @@ async def tts(req: TTSReq):
 
     return StreamingResponse(iter([r.content]), media_type=media)
 
-# Servir archivos estáticos al final
+# Serve static files at the end
 static_dir = Path(__file__).parent
 app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")

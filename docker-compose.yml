@@ -11,7 +11,7 @@ services:
 
   tts-webapp:
     build:
-      context: ./tts-webapp
+      context: .
       dockerfile: Dockerfile
     container_name: tts-webapp
     ports:
