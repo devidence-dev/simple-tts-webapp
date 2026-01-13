@@ -1,0 +1,37 @@
+volumes:
+  docstore:
+
+services:
+  kokoro-tts:
+    image: ghcr.io/remsky/kokoro-fastapi-cpu:latest
+    container_name: kokoro-tts
+    ports:
+      - "8880:8880"
+    restart: unless-stopped
+
+  tts-webapp:
+    build:
+      context: ./tts-webapp
+      dockerfile: Dockerfile
+    container_name: tts-webapp
+    ports:
+      - "8000:8000"
+    environment:
+      - KOKORO_BASE=http://kokoro-tts:8880
+    depends_on:
+      - kokoro-tts
+    restart: unless-stopped
+
+  # openreader-webui:
+  #   image: ghcr.io/richardr1126/openreader-webui:latest
+  #   container_name: openreader-webui
+  #   environment:
+  #     - API_BASE=http://kokoro-tts:8880/v1
+  #     # - API_KEY=not-needed  # opcional; Kokoro suele no requerir key
+  #   ports:
+  #     - "3003:3003"
+  #   volumes:
+  #     - docstore:/app/docstore
+  #   depends_on:
+  #     - kokoro-tts
+  #   restart: unless-stopped
