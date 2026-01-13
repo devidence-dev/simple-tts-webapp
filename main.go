@@ -3,10 +3,12 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -52,6 +54,10 @@ func main() {
 			return c.Status(400).JSON(fiber.Map{"error": "Invalid JSON"})
 		}
 
+		if strings.TrimSpace(req.Text) == "" {
+			return c.Status(400).JSON(fiber.Map{"error": "Text cannot be empty"})
+		}
+
 		// Set defaults
 		if req.Voice == "" {
 			req.Voice = "af_bella"
@@ -82,6 +88,14 @@ func main() {
 		}
 		defer resp.Body.Close()
 
+		log.Printf("Kokoro response status: %d", resp.StatusCode)
+
+		if resp.StatusCode != 200 {
+			body, _ := io.ReadAll(resp.Body)
+			log.Printf("Kokoro error body: %s", string(body))
+			return c.Status(resp.StatusCode).Send(body)
+		}
+
 		mediaTypes := map[string]string{
 			"mp3":  "audio/mpeg",
 			"wav":  "audio/wav",
@@ -95,8 +109,15 @@ func main() {
 			contentType = "application/octet-stream"
 		}
 
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+		}
+
 		c.Set("Content-Type", contentType)
-		return c.SendStream(resp.Body)
+		c.Set("Content-Length", fmt.Sprintf("%d", len(body)))
+		log.Printf("Sending audio, content-type: %s, size: %d bytes", contentType, len(body))
+		return c.Send(body)
 	})
 
 	// Serve static files
