@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TTS WebApp - Text to Speech</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <style>
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -62,14 +63,14 @@
                     <div class="d-grid gap-2 mb-3">
                         <div class="row g-2">
                             <div class="col-6">
-                                <button type="button" class="btn btn-light w-100" id="copyBtn">📋 Copy</button>
+                                <button type="button" class="btn btn-light w-100" id="copyBtn"><i class="bi bi-clipboard me-1"></i>Copy</button>
                             </div>
                             <div class="col-6">
-                                <button type="button" class="btn btn-success w-100" id="downloadBtn" disabled>⬇️ Download</button>
+                                <button type="button" class="btn btn-success w-100" id="downloadBtn" disabled><i class="bi bi-download me-1"></i>Download</button>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary" id="generateBtn">✨ Generate Audio</button>
-                        <button type="button" class="btn btn-danger d-none" id="stopBtn">⏹️ Stop</button>
+                        <button type="submit" class="btn btn-primary" id="generateBtn"><i class="bi bi-magic me-1"></i>Generate Audio</button>
+                        <button type="button" class="btn btn-danger d-none" id="stopBtn"><i class="bi bi-stop-circle me-1"></i>Stop</button>
                     </div>
                 </form>
                 <div class="mt-3 d-none" id="audioPlayer">
@@ -99,6 +100,29 @@
         let audioUrl = null;
         let abortController = null;
 
+        // Funciones para localStorage
+        function saveSettings() {
+            const settings = {
+                voice: voiceSelect.value,
+                format: formatSelect.value,
+                speed: speedInput.value
+            };
+            localStorage.setItem('ttsSettings', JSON.stringify(settings));
+        }
+
+        function loadSettings() {
+            const saved = localStorage.getItem('ttsSettings');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                if (settings.voice) voiceSelect.value = settings.voice;
+                if (settings.format) formatSelect.value = settings.format;
+                if (settings.speed) {
+                    speedInput.value = settings.speed;
+                    speedValue.textContent = settings.speed + 'x';
+                }
+            }
+        }
+
         // Cargar voces disponibles
         async function loadVoices() {
             try {
@@ -112,7 +136,8 @@
                     voiceSelect.appendChild(option);
                 });
                 if (voices.voices.length > 0) {
-                    voiceSelect.value = voices.voices[0];
+                    // Cargar configuración guardada después de tener las voces disponibles
+                    loadSettings();
                 }
             } catch (error) {
                 showStatus('Error loading voices', 'error');
@@ -138,7 +163,12 @@
         // Actualizar velocidad
         speedInput.addEventListener('input', () => {
             speedValue.textContent = speedInput.value + 'x';
+            saveSettings();
         });
+
+        // Guardar configuración cuando cambien los selects
+        voiceSelect.addEventListener('change', saveSettings);
+        formatSelect.addEventListener('change', saveSettings);
 
         // Copiar texto
         copyBtn.addEventListener('click', () => {
