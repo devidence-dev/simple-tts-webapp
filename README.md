@@ -4,7 +4,7 @@ A simple web application to convert text to audio using the Kokoro TTS service.
 
 ## Description
 
-This application provides an intuitive web interface to generate audio from text using the Kokoro voice synthesis engine. It is built with FastAPI for the backend and pure HTML/CSS/JavaScript for the frontend.
+This application provides an intuitive web interface to generate audio from text using the Kokoro voice synthesis engine. It is built with Fiber for the backend and pure HTML/CSS/JavaScript for the frontend.
 
 ## Features
 
@@ -18,7 +18,7 @@ This application provides an intuitive web interface to generate audio from text
 
 ## Prerequisites
 
-- Python 3.13 or higher
+- Go 1.21 or higher
 - Docker and Docker Compose (optional, for full deployment)
 
 ## Installation
@@ -33,17 +33,22 @@ This application provides an intuitive web interface to generate audio from text
 
 2. Install dependencies:
    ```bash
-   pip install -e .
+   go mod download
    ```
 
-3. Ensure the Kokoro service is running on `http://localhost:8880` (see Docker section).
-
-4. Run the application:
+3. Build the application:
    ```bash
-   uvicorn main:app --host 0.0.0.0 --port 8000
+   go build -o main .
    ```
 
-5. Open your browser at `http://localhost:8000`
+4. Ensure the Kokoro service is running on `http://localhost:8880` (see Docker section).
+
+5. Run the application:
+   ```bash
+   ./main
+   ```
+
+6. Open your browser at `http://localhost:8000`
 
 ### Option 2: Docker Deployment
 
@@ -101,10 +106,8 @@ Generates audio from text.
 
 ## Dependencies
 
-- FastAPI: Web framework for Python
-- httpx: Asynchronous HTTP client
-- Pydantic: Data validation
-- Uvicorn: ASGI server
+- Fiber: Web framework for Go
+- net/http: Standard HTTP client
 - Kokoro TTS: Voice synthesis service (requires separate deployment)
 
 ## Contribution

@@ -1,23 +1,32 @@
-FROM python:3.13-slim
+FROM golang:1.21-alpine AS builder
 
 WORKDIR /app
 
-# Instalar dependencias del sistema
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/*
+# Copiar go.mod y go.sum
+COPY go.mod go.sum ./
 
-# Copiar pyproject.toml y requirements
-COPY pyproject.toml .
+# Descargar dependencias
+RUN go mod download
 
-# Instalar dependencias Python
-RUN pip install --no-cache-dir -e .
+# Copiar archivos fuente
+COPY main.go .
 
-# Copiar archivos de la app
-COPY main.py .
+# Construir la aplicación
+RUN go build -o main .
+
+# Imagen final
+FROM alpine:latest
+
+WORKDIR /app
+
+# Copiar el binario
+COPY --from=builder /app/main .
+
+# Copiar archivos estáticos
 COPY index.html .
 
 # Exponer puerto
 EXPOSE 8000
 
-# Comando para ejecutar la app
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Ejecutar
+CMD ["./main"]
